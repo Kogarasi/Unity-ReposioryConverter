@@ -25,22 +25,26 @@ class Handler {
     }
 
     fun main( input: Input, context: Context): String {
-        val filename = context.awsRequestId
+
+        val filename = "github-" + context.awsRequestId
         val extractPath = "/tmp/$filename"
         val downloadFilePath = downloader.download( input.user, input.repo, input.branch, filename )
 
         extractor.extract( downloadFilePath, extractPath )
+
         val convettedFile = converter.convert( extractPath )
 
         println( "Convertted File:" + convettedFile )
         S3Client().uploadFile( "${filename}.unitypackage", File( convettedFile ) )
 
-        clean()
+        clean( File( downloadFilePath ), File( extractPath ), File( convettedFile ) )
 
         return "${filename}.unitypackage"
     }
 
-    fun clean(){
-        File( "/tmp/" ).deleteRecursively()
+    fun clean( downloadFile: File, extractFile: File, converttedFile: File ){
+        downloadFile.delete()
+        extractFile.deleteRecursively()
+        converttedFile.delete()
     }
 }

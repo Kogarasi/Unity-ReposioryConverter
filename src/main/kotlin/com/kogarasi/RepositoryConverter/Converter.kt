@@ -20,6 +20,7 @@ class Converter {
     var entities = HashMap<String, Entity>()
 
     fun convert( rootPath: String ): String {
+        entities.clear()
 
         File(rootPath).walkTopDown().iterator().forEach {
             if( it.isFile ){
